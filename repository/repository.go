@@ -75,3 +75,66 @@ func (r *Repository) GetAllBooks(ctx fiber.Ctx) error {
   )
   return nil
 }
+
+func (r *Repository) DeleteBook(ctx fiber.Ctx) error {
+  book := models.Book{}
+
+  id := ctx.Params("id")
+  if id == "" {
+    ctx.Status(http.StatusBadRequest).JSON(
+      &fiber.Map{
+        "message": "Please provide the id to delete the book",
+      },
+    )
+    return fmt.Errorf("Error: didn't recieve any id")
+  }
+  
+  err := r.DB.Delete(book, id)
+  if err.Error != nil {
+    ctx.Status(http.StatusBadRequest).JSON(
+      &fiber.Map{
+        "message": "Error in deleting the entry from database",
+      },
+    )
+    return err.Error
+  }
+
+  ctx.Status(http.StatusOK).JSON(
+    &fiber.Map{
+      "message": "book deleted succesfully",
+    },
+  )
+  return nil
+}
+
+func (r *Repository) GetBookByID(ctx fiber.Ctx) error {
+  book := models.Book{}
+
+  id := ctx.Params("id")
+  if id == "" {
+    ctx.Status(http.StatusBadRequest).JSON(
+      &fiber.Map{
+        "message": "Please provide the id to delete the book",
+      },
+    )
+    return fmt.Errorf("Error: didn't recieve any id")
+  }
+
+  err := r.DB.Where("id = ?", id).First(book).Error
+  if err != nil {
+    ctx.Status(http.StatusBadRequest).JSON(
+      &fiber.Map{
+        "message": fmt.Sprintf("Error finding the books with the following id - %s", id),
+      },
+    )
+    return err
+  }
+
+  ctx.Status(http.StatusOK).JSON(
+    &fiber.Map{
+      "message": "Success!",
+      "book": book,
+    },
+  )
+  return nil
+}
