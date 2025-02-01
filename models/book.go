@@ -1,29 +1,16 @@
 package models
 
-import (
-  "github.com/google/uuid"
-)
+import "gorm.io/gorm"
 
 type Book struct {
-	Author    string  `json:"author"`
-	Title     string  `json:"title"`
-	Publisher string  `json:"publisher"`
+	Author    *string `json:"author"`
+	Title     *string `json:"title"`
+	Publisher *string `json:"publisher"`
 	Price     float32 `json:"price"`
-  Id        string  `json:"id"`
+	Id        uint    `json:"id" gorm:"primary key;autoIncrement"`
 }
 
-func (b *Book) CreateBook(book Book) (Book, error) {
-  return Book{}, nil
-}
-
-func (b *Book) DeleteBook(id uuid.UUID) error {
-  return nil
-}
-
-func (b *Book) GetBookById(id uuid.UUID) Book {
-  return Book{}
-}
-
-func (b *Book) GetAllBooks() []Book {
-  return []Book{}
+func MigrateBooks(db *gorm.DB) error {
+  err := db.AutoMigrate(&Book{})
+  return err
 }
